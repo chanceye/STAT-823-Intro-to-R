@@ -1,0 +1,343 @@
+---
+title: "Graphics in R"
+author: "Ellen Chancey"
+date: "July 15, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Basic Graphics in R
+
+### Item 1
+```{r}
+?cars
+dim(cars)
+```
+
+### Item 2
+```{r}
+plot(cars$speed,cars$dist)
+```
+
+### Item 3
+```{r}
+plot(cars$speed,cars$dist, 
+    main="Scatterplot of Speed versus Distance",
+    sub="Using plot() in R",
+    xlab="Speed (miles per hour)",
+    ylab="Stopping Distance (feet)",
+    pch=19, # closed circle
+    col="blue",
+    col.axis="orange", # axis color
+    col.lab="dark green", # axis label color
+    bg="gray", # background color
+    col.main="red", # main title color
+    cex=1.5
+    )
+```
+
+### Item 4
+```{r}
+plot(cars$speed,cars$dist, 
+     main="Scatterplot of Speed versus Distance",
+     sub="Using plot() in R",
+     xlab="Speed (miles per hour)",
+     ylab="Stopping Distance (feet)",
+     pch=19, # closed circle
+     col="blue",
+     col.axis="orange", # axis color
+     col.lab="dark green", # axis label color
+     bg="gray", # background color
+     col.main="red", # main title color
+     cex=1.5, # sizing
+     axes=FALSE # turns off auto axis
+    )
+abline(lm(dist~speed,data=cars)) # best fit line
+grid() # adds grid
+box(col="red",lwd=3,lty=3) # adds box around plot
+legend("bottomright",  # adds a legend
+       inset=0.01,
+       title="Distance vs.Speed",
+       legend=c("Observation"),
+       col=c("blue"),
+       pch=19,
+       horiz=TRUE
+       )
+```
+
+
+### Item 5
+```{r}
+library(ggplot2)
+summary(diamonds)
+par(mar = c(5, 7, 5, 5))
+plot(diamonds$carat,
+     diamonds$price,
+     col=diamonds$color,
+     pch=18,
+     main = "Scatterplot of Diamond Size versus Price",
+     xlab = "",
+     ylab = "",
+     xlim = c(0,5),
+     ylim = c(0,20000),
+     axes = FALSE
+     )
+
+axis(1, c(seq(from = 0, to = 5, by = 0.5)))
+axis(2, c(seq(from = 0, to = 20000, by = 5000)), las = 1)
+mtext("Size (carats)", side = 1, line = 3)
+mtext("Price ($)", side = 2, line = 5)
+legend("bottomright",
+       title = "Diamond Color",
+       legend = levels(diamonds$color),
+       col = c(1:7),
+       pch = 18,
+       bty = "n"
+       )
+```
+
+### Item 6
+```{r}
+qplot( diamonds$carat, 
+       diamonds$price, 
+       colour = diamonds$color,
+       alpha = I(1/10),
+       main = "Scatterplot of Diamond Sizes versus Price", 
+       xlab = "Size (carats)",
+       ylab = "Price ($)"
+       )
+```
+
+###  Item 7
+For diamonds under 1 carat, as size increases, price increases, For diamonds over 1 carat, they are more costly than smaller diamonds, but their price widely varies. Some diamond colors are more valuable than others, D is relatively inexpensive, E and F are moderately pricey and colors H, I, and J tend to be most expensive. 
+
+
+# Advanced Graphics in R with ggplot
+
+###  Item 1
+Describe the data, aesthetic mappings and layers used.
+The data contains fuel economy for 38 modles in 1998 and 2008.  
+Uses a scatterplit to view the correlation between city and highway fuel efficiency (mpg)
+```{r}
+ggplot(mpg,aes(cty,hwy))+geom_point()
+
+```
+
+Diadmonds dataset contains price and size of 50,000 round cut diamonds. Graph uses a scatterplot to view relationship between carat and price.
+```{r}
+ggplot(diamonds,aes(carat,price))+geom_point()
+?diamonds()
+```
+
+Economics dataset contains economic variables across time. This graphic looks at unemployment number over time in a line graph.
+```{r}
+ggplot(economics,aes(date,unemploy))+geom_line()
+?economics
+```
+
+This histogram looks at the city fuel economy of models in the dataset.
+```{r}
+ggplot(mpg,aes(cty))+geom_histogram()
+?mpg()
+```
+
+###  Item 2
+Iris dataset contains measurements of 3 species of iris
+```{r}
+?iris
+```
+
+###  Item 3 
+Map the data and aestetic mapping
+```{r}
+plot1 <- ggplot(data = iris, aes(Petal.Length, Petal.Width))
+print(plot1)
+```
+
+###  Item 4 
+Create the scatterplot
+```{r}
+plot2 <- plot1 + geom_point(aes(color = Species))
+print(plot2)
+```
+
+###  Item 5 
+Add linear regression
+```{r}
+plot3 <- plot2 + geom_smooth(method = "lm")
+print(plot3)
+```
+
+###  Item 6 
+Enhancements
+```{r}
+final <- plot3 +
+  xlab("Petal Length (cm)") +
+  ylab("Petal Width (cm)") +
+  ggtitle("Petal Length versus Width")
+plot(final)
+```
+
+###  Item 7 
+Alter color
+```{r}
+plot1 <- ggplot(data = iris, aes(Petal.Length, Petal.Width))
+print(plot1)
+
+plot2 <- plot1 + geom_point(aes(color=Sepal.Length))
+print(plot2)
+
+# plot2 <- plot1 + geom_point(aes(color=Sepal.Length),aes(shape=Sepal.Width))
+# print(plot2)
+
+plot3 <- plot2 + geom_smooth(method = "lm")
+print(plot3)
+
+final <- plot3 +
+  xlab("Petal Length (cm)") +
+  ylab("Petal Width (cm)") +
+  ggtitle("Petal Length versus Width")
+plot(final)
+```
+
+A continuous variable cannot be mapped to shape, likely because there are too many items in a continuous variable a shape for each one can't be calculated because not all values can be calculated. The code below has been commented out so that it won't throw an error.
+```{r}
+# plot4 <- plot1 + geom_point(aes(shape=Sepal.Width))
+# print(plot4)
+```
+
+This scatter plot uses sepal width as size
+```{r}
+plot5 <- plot1 + geom_point(aes(size=Sepal.Width))
+print(plot5)
+```
+
+###  Item 8
+```{r}
+# install.packages(plyr)
+```
+
+###  Item 9
+```{r}
+library(plyr)
+library(dplyr)
+vert.line <- ddply(iris, .(Species), function(sp) {
+  mean(sp$Petal.Length)})
+```
+
+###  Item 10
+```{r}
+ggplot(data = iris, aes(x = Petal.Length)) +
+  geom_histogram() +
+  geom_vline(data = vert.line, aes(xintercept = V1, color = Species)) +
+  facet_grid(Species ~ . ) +
+  ggtitle("Petal Lengths by Species")
+```
+
+###  Item 11
+Moved Species to the other side of the dot within facet_grid()
+```{r}
+ggplot(data = iris, aes(x = Petal.Length)) +
+  geom_histogram() +
+  geom_vline(data = vert.line, aes(xintercept = V1, color = Species)) +
+  facet_grid(. ~ Species) +
+  ggtitle("Petal Lengths by Species")
+
+```
+
+###  Item 12
+```{r}
+ggplot(data = iris, aes(x=Petal.Length)) +
+  geom_histogram(alpha = 0.2, position = "identity") +
+  geom_vline(data = vert.line, aes(xintercept=V1 ,color=Species )) +
+  ggtitle("Petal Length by Species Overlayed") +
+  annotate("segment", x = 4.8, y = 14.5, xend = 4.8, yend = 5, size = 0.5,
+             arrow = arrow(length=unit(.2, "cm"))) +
+  annotate("text", label = "Overlap", x = 4.8, y = 15, size = 3,
+             fontface = "bold")
+```
+
+###  Item 13
+Using continuous variable for facet makes a large number of rows, making it very difficult to read.
+```{r}
+ggplot(data = iris, aes(x=Petal.Length)) +
+  geom_histogram(alpha = 0.2, position = "identity") +
+  geom_vline(data = vert.line, aes(xintercept=V1 ,color=Species )) +
+  ggtitle("Petal Length by Species Overlayed") +
+  annotate("segment", x = 4.8, y = 14.5, xend = 4.8, yend = 5, size = 0.5,
+           arrow = arrow(length=unit(.2, "cm"))) +
+  annotate("text", label = "Overlap", x = 4.8, y = 15, size = 3,
+           fontface = "bold") +
+  facet_grid(Petal.Width ~ .)
+```
+
+###  Item 14
+```{r}
+#?mpg()
+#?aes()
+```
+
+a) drive train and fuel economy
+```{r}
+ggplot(data=mpg, aes(x=hwy,y=cty)) +
+  ggtitle("The Relationship Between Fuel Economy and Drive Train") +
+  #facet_grid(drv ~ .) +
+  geom_point(aes(color=drv))
+```
+
+b) drive train, engine size, class
+```{r}
+ggplot(data=mpg, aes(x=class,y=displ)) +
+  ggtitle("Relationship Between Drive Train, Class, and Engine Size") + 
+  geom_point(aes(color=drv))
+  #facet_grid(drv ~ .) 
+```
+
+c) fuel economy, engine size, cylinders  
+Faceting by cyl doesn't significantly change the assessment of fuel economy and engine size because cylinders are closely grouped by engine size
+```{r}
+ggplot(data=mpg, aes(x=displ,y=cty)) +
+  ggtitle("The Relationship Between Fuel Economy, Engine Size, and Cylinders") + 
+  geom_point(aes(color=cyl)) +
+  facet_grid( . ~ cyl)
+```
+
+###  Item 15
+```{r}
+ggplot(mpg, aes(displ, hwy)) + 
+    geom_point() + 
+    geom_smooth()
+```
+
+##### (a) 
+```{r}
+ggplot(mpg, aes(displ, hwy)) + geom_point() + geom_smooth(span = 0.2)
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + geom_point() + geom_smooth(span = 1)
+```
+
+##### (b) 
+```{r}
+ggplot(mpg, aes(displ, hwy)) + geom_point() + geom_smooth(method="lm")
+```
+
+##### (c) 
+```{r}
+ggplot(mpg, aes(displ, hwy)) + geom_point() + geom_smooth(method="rlm")
+```
+
+### Item 16
+```{r}
+vignette("ggplot2-specs") 
+```
+
+```{r session-info}
+sessionInfo()
+```
+
+
