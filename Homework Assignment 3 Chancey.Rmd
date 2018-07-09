@@ -1,0 +1,800 @@
+---
+title: "R Programming Activity 2"
+author: "Ellen Chancey"
+date: "June 30, 2017"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+  word_document: default
+  pdf_document: default 
+  odt_document: default
+  md_document: default
+  rtf_document: default
+---
+
+```{r setup, include=FALSE}
+# This chunk of code sets up the R session to perform the analysis
+# Load packages, load data, load any other source scripts that may contain
+# code or objects you will want to run to produce the report
+
+# load packages
+library(knitr)
+library(rmarkdown)
+library(DT)
+
+# declare global options
+# knitr::opts_chunk$set(echo = FALSE)
+
+# determine output format dynamically
+out_type <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+
+# load data sets
+# For example,
+
+# define custom function for data label outputs
+# The DT::datatable function is great for producing tables for HTML docs
+# Otherwise, use the knitr::kable function to produce tables
+# You should use the R help to learn about these two functions as they
+# will need to be used to produce visually appealing tables for your 
+# report
+
+display_output <- function(dataset, out_type, filter_opt = 'none') {
+  
+  if (out_type == "html") {
+    out_table <- DT::datatable(dataset, filter = filter_opt)
+  } else {
+    out_table <- knitr::kable(dataset)
+  } 
+  
+  out_table
+}
+```
+
+# Working with R Objects.
+
+### Vector Manipulation.
+
+Create a vector from a sequence of integers from 5 to 1:
+```{r}
+x <- c(5:1)
+print(x)
+
+```
+
+Divide all elements of the vector x by 2:
+```{r}
+x/2
+
+```
+
+Square all elements of the vector x:
+```{r}
+x^2
+
+```
+
+Perform vector multiplication--multiply vector x by itself:
+```{r}
+x%*%x
+
+```
+
+Take the square root of the elements of the vector x:
+```{r}
+sqrt(x)
+
+```
+
+Find the minimum (smallest) element of the vector x:
+```{r}
+min(x)
+
+```
+
+
+### Matrix Manipulation.
+
+Create a 2X2 matrix A and fill it (column-wise) with a sequence of integers from 1 to 4.
+```{r}
+A <- matrix(nrow=2,ncol=2,c(1:4))
+print(A)
+
+```
+
+Create another 2x2 matrix B and a vector x
+```{r}
+B <- matrix(nrow=2,ncol=2,c(1:4)) 
+print(B)
+x <- c(2,2) 
+```
+
+Matrices can be added and subtracted.
+```{r}
+A+B
+A - B 
+```
+
+A matrix can be transposed, more than once
+```{r}
+t(A) 
+t(t(A)) 
+```
+
+Mathematical manipulation of matrices and  vectors
+```{r}
+A*B 
+A%%B 
+A%%x
+x%*%A%*%x 
+solve(A)
+```
+
+Assign aspects of a matrix, such as the row or column, to a vector
+```{r}
+C <- matrix(nrow=4,ncol=4,c(1:16)) 
+C
+
+a1 <- A[1,] 
+a1
+
+a2 <-A[2,]  
+a2
+
+b1 <- B[,1] 
+b1
+
+b2 <- B[,2] 
+b2
+```
+
+Create a new matrix from an aspect of an existing matrix
+```{r}
+c_c <-C[,2:3]
+c_c
+
+c_r <-C[1:2,] 
+c_r
+```
+
+Using repetition to population a matrix and returning only certain elements
+```{r}
+C[c(1,3),] <- matrix(nrow=2,ncol=4,c(rep(1,8)))
+```
+
+Replacing rows of a matrix
+```{r}
+C[c(1,3),]
+```
+
+Creating a matrix, returning it without the second row
+```{r}
+y <- matrix(c(4,5,2,3),nrow = 2) 
+y[-2,] 
+```
+
+Adding amounts to columns of a matrix
+```{r}
+x<- matrix(nrow=3,ncol=2,c(1:6)) 
+x
+
+x+c(0,1)
+```
+
+Find the mean of each row, or column
+```{r}
+z <-matrix(nrow=3,ncol=2,c(1:6))
+z
+
+apply(z,1,mean)
+apply(z,2,mean) 
+
+```
+
+
+### Character Strings.
+
+Create a character object y that consists of the string "abc".
+```{r}
+y <- "abc"
+```
+
+Returns the length of the string y
+```{r}
+length(y)  
+```
+
+Returns the mode of storage for string y
+```{r}
+mode(y) 
+```
+
+Assigning multiple strings to a vector, finding length and mode of that vector
+```{r}
+z<- c("abc","29 88")
+length(z) 
+mode(z) 
+```
+
+Merging two strings
+```{r}
+w_w <-paste("Wonder", "Woman") 
+```
+
+Returning seperate strings
+```{r}
+ww <-strsplit(w_w," ") 
+```
+
+Evaluting the vector to determine if it is a list
+```{r}
+is.list(ww) 
+```
+
+Identifies which elements contain the specified string
+```{r}
+grep("West",c("North","South", "South East", "North West", "West")) 
+```
+
+Finding the number of characters in a string
+```{r}
+nchar("You're gonna need a bigger boat.") 
+```
+
+Finding specific characters within a string
+```{r}
+substr("Jaws",2,3) 
+```
+
+Finding the specific character where a substring begins in the string
+```{r}
+regexpr("aw","Jaws") 
+```
+
+Seperation of a string using a specified delimiter
+```{r}
+strsplit("6-16-2011", split="-")
+```
+
+
+### Sequences.
+
+Returns examples of sequences
+```{r}
+example(seq)
+```
+
+Assigns the value 10 to n
+```{r}
+n <- 10 
+```
+
+Creates a sequence that starts with zero
+```{r}
+1:n-1 
+```
+
+Creates a sequence that starts with 1
+```{r}
+1:(n-1)
+```
+
+Creates a sequence that is however many numbers it takes to get rom the specified minimum to the specified maximum, using the specified interval
+```{r}
+seq(-10,10,by=2) -> sequence.1  
+```
+
+Creates a sequence with eleven elements, starting with the specified number and spacing by the specified amount
+```{r}
+sequence.2 <- seq(length=11, from = -10, by = 2) 
+```
+
+Creates a sequence that repeats the values in matrix x five times
+```{r}
+sequence.3 <- rep(x,5) 
+```
+
+Creates a sequence that repeats the listed numbers three times
+```{r}
+sequence.4 <- rep(c(5,2,7),3) 
+```
+
+Creates a sequence that repeats each listed number three times
+```{r}
+sequence.5 <- rep(c(5,2,7),each=3) 
+```
+
+
+### Logicals.
+
+Creates an object, a, with four logical elements
+```{r}
+a <- c(TRUE,TRUE,FALSE,FALSE) 
+```
+
+Creates an object,b, with four logical elements
+```{r}
+b <- c(FALSE,TRUE,TRUE,FALSE) 
+```
+
+Returns a true if one exists in a or b at that position
+```{r}
+a|b 
+```
+
+Returns a true if both a & b are true at that position
+```{r}
+a&b 
+```
+
+Returns a false unless both a & b are true
+```{r}
+!a&b 
+```
+
+Returns a true if both a & b are false
+```{r}
+!a&!b 
+```
+
+Returns a false unless both a & b are true
+```{r}
+!(a&b)
+```
+
+Coerces a and b into numeric and adds the numbers
+```{r}
+a+b 
+```
+
+Evaluates matrix x elements and returns true if their value is larger than three
+```{r}
+dummy.1 <- x>3 
+```
+
+Evaluates matrix x elements and returns true if the value is equal to 3
+```{r}
+dummy.2 <- x ==3 
+```
+
+Reassigns x as a vector with elements one through ten
+```{r}
+x <- 1:10 
+```
+
+Evaluates if x contains any numbers larger than 8
+```{r}
+any(x>8) 
+```
+
+Evaluates if x contains any numbers larger than 88
+```{r}
+any(x>88) 
+```
+
+Evaluates if all elements in x are larger than 88
+```{r}
+all(x>88) 
+```
+
+Evaluates if all elements in x are larger than zero
+```{r}
+all(x>0) 
+```
+
+Reassigns x as a vector with elements one through three
+```{r}
+x <- 1:3 
+```
+
+Reassigns y as a vector with elements one, three, and four
+```{r}
+y<- c(1,3,4) 
+```
+
+Evaluates if the first element in x is equal to the first element in y and so on
+```{r}
+x==y 
+```
+
+Evaluates if all of the elements in x are equal by position
+```{r}
+all(x==y) 
+```
+
+Evaluates if there are difference between x and y
+```{r}
+identical(x,y) 
+```
+
+Reassigns x as a vector with elements one and two
+```{r}
+x <-1:2 
+```
+
+Reassigns y as a vector with elements one, three and four
+```{r}
+y<-c(1,3,4) 
+```
+
+Evaluates if elements in x and y are equal  
+*Warns that x and y have differing lengths, but returns a false for the last element*
+```{r}
+x==y 
+```
+
+Evaluates if all the elements in x and y are equal  
+*Returns false but warns about different lengths*
+```{r}
+all(x==y) 
+```
+
+Evaluates if and y are identical
+```{r}
+identical(x,y) 
+```
+
+Reassigns x to vector with elements one and two
+```{r}
+x<-1:2 
+```
+
+Reassigns y to vector with elements one and two
+```{r}
+y<-c(1,2) 
+```
+
+Returns the elements of x then the elements of y
+```{r}
+x;y 
+```
+
+Evaluates if x and y are identical, it is false
+```{r}
+identical(x,y) 
+```
+
+Returns type of storage for x, in thise case integer
+```{r}
+typeof(x) 
+```
+
+Returns type of storage for y, in this case double
+```{r}
+typeof(y) 
+```
+
+
+### Missing Data.
+
+Creates a vector with elements one, two, three, and NA
+```{r}
+z <- c(1:3,NA) 
+```
+
+Function evaluates if the element in z is an NA and assigns that value to vector z.dummy
+```{r}
+z.dummy <-is.na(z) 
+```
+
+Does not evaluate if the elements in z are NA, creates an error message indicating is.na should be used
+```{r}
+z.dummy2 <- z==NA 
+```
+
+Returns NaN
+```{r}
+0/0 
+```
+
+Returns true 
+```{r}
+is.na(0/0) 
+```
+
+Returns true
+```{r}
+is.nan(0/0) 
+```
+
+Evaluates the elements of z for NaN  
+*returns all false because NA is not NaN*
+```{r}
+is.nan(z) 
+```
+
+Returns NA because mean can't be determined
+```{r}
+mean(z) 
+```
+
+Indicates that the vector being evaluated contains an NA element, ignores it for calculating mean
+```{r}
+mean(z,na.rm=T) 
+```
+
+Reassigns x
+```{r}
+x <- c(88,NULL,12,168,13) 
+```
+
+Runs without error for the null element
+```{r}
+mean(x) 
+```
+
+Assigns u the element NULL
+```{r}
+u <- NULL 
+```
+
+Returns length of zero
+```{r}
+length(u) 
+```
+
+Assigns na to v
+```{r}
+v <- NA 
+```
+
+Returns length one
+```{r}
+length(v) 
+```
+
+
+### Simple Subsetting.
+
+Creates a vector with elements one through five, then 3 elements of NA
+```{r}
+x <- c(c(1:5),c(rep(NA,3))) 
+```
+
+Evaluates if the elements in x are NA, the last three elements are true
+```{r}
+is.na(x) 
+```
+
+Returns elements of x that are evaluated as being na
+```{r}
+x[is.na(x)] 
+```
+
+Returns all elements of x that are not na
+```{r}
+x[!is.na(x)] 
+```
+
+Evaluates if each element is greater than two, returns NA for final three NA elements
+```{r}
+x>2 
+```
+
+A logical evaluation of the elements in x  based on if they are not na and are larger than two, returns NA for NA elements
+```{r}
+!is.na(x)&x>2 
+```
+
+A logical evaluation of the elements in x based on if they are not null and are larger than two, returns FALSE for NAs
+```{r}
+x[!is.na(x)&x>2] 
+```
+
+Reassigns x to a 2X3 matrix containing values one through six
+```{r}
+x<- matrix(1:6,2,3) 
+```
+
+Creates a list with componenets of different classes
+```{r}
+w <- list(one=1:5, two = 0.6, three = "HI") 
+```
+
+Returns the first component in the list, a vector with elements one through five
+```{r}
+w$one 
+```
+
+Returns the first component in the list, a vector with elements one through five
+```{r}
+w[["one"]] 
+```
+
+Returns the first component in the list, a vector with elements one through five
+```{r}
+w[[1]] 
+```
+
+Returns the third element of the first componenet in the list
+```{r}
+w[[c(1,3)]] 
+```
+
+Returns the third element of the first component
+```{r}
+w[[1]][[3]] 
+```
+
+Returns the first and third componenet
+```{r}
+w[c(1,3)] 
+```
+
+Reassigns z as a vector with four elements
+```{r}
+z<- c(5,2,-3,8) 
+```
+
+Returns the elements that make up the vector
+```{r}
+z 
+```
+
+Returns TRUE if the value of multiplying the element by itself results in a number larger than 8
+```{r}
+z*z > 8 
+```
+
+Returms elements of the vector z that meet the specified criteria
+```{r}
+z[z*z>8] 
+```
+
+Assigns the values that meet the specified criteria to the vector w
+```{r}
+w <-z[z*z>8] 
+w
+```
+
+Reassigns x as a vector with six elements
+```{r}
+x <- c(6,1:3,NA,12) 
+x
+```
+
+Returns the values in vector x that meet the criteria, **including** NA
+```{r}
+x[x>5] 
+```
+
+Returns the values in vector x that meet the criteria, **excluding** NA
+```{r}
+subset(x,x>5) 
+```
+
+Changes any element in x meeting the requirement to the value specified
+```{r}
+x[x>3] <- 0 
+x
+```
+
+Returns the position number of the elements that meet the requirement
+```{r}
+which(z*z>8) 
+```
+
+
+### Arrays.
+### Write the Code.
+
+####1. Create a vector of length 10 and fill it with a sequence of integers.
+```{r}
+v <- c(12:21)
+v
+```
+
+####2. Coerce the vector into a matrix of 5 rows and 2 columns.
+```{r}
+vm <-matrix(v,nrow=5,ncol=2)
+vm
+```
+
+####3.  Name the columns of the matrix "A" and "B".
+```{r}
+colnames(vm) <- c("A","B")
+vm
+```
+
+####4. Generate 12 random numbers from a uniform distribution and store them in a matrix of 4 rows and 3 columns.
+```{r}
+d <- rnorm(12,6)
+d
+dm <-matrix(d,nrow=4,ncol=3)
+dm
+```
+
+####5. Name the rows of the matrix "1st Row", "2nd Row", "3rd Row", and "4th Row".
+```{r}
+rownames(dm) <-c("1st Row","2nd Row","3rd Row", "4th Row")
+dm
+```
+
+####6. Using bracket notation, print the element of the matrix that is in the 2nd row, 1st column. Assign the entire 2nd column of the matrix to a new object r.
+```{r}
+dm[2,1]
+r<-dm[,2]
+r
+```
+
+####7. Assume that we have recorded the names and ages for four people
+James is 27, Art is 42, Kate is 29, and Alex is 33. Create a vector of names and a vector of ages from the data, making sure that you keep the ordering of the elements consistent.
+```{r}
+n<-c("James", "Art","Kate","Alex")
+n
+a<-c(27,42,29,33)
+a
+```
+
+Use the class() function to print the class metadata R has stored for each vector.
+```{r}
+class(n)
+class(a)
+```
+
+Using data.frame(), combine the two vectors into a dataframe and name the columns something informative. Print out the dataframe.
+```{r}
+df<-data.frame(name=n,age=a)
+df
+```
+
+####8. Assume that we have the following observations of temperature:23???C, 30???, 19???, 27???.
+Create a vector C concatenating these values. 
+```{r}
+C<-c(23,30,19,27)
+C
+```
+
+Recall the relationship between Celsius and Fahrenheit temperatures: ???F = ???C  ×5 + 32.
+Using a single line of code that includes arithmetic operations, create a new vector F that contains the temperatures transformed to Fahrenheit scale.
+```{r}
+F<-(C*(9/5)+32)
+F
+```
+
+
+####9. Suppose we have a sample of 15 plants from all across the country and their state of origin is specified by a character vector:
+```{r}
+state<- c("MO","KS","KS","KS","MO","NE","OK","MO","KS","NE","NE","OK","MO","KS","KS")
+state
+```
+
+Use the factor() function to change the character vector state to a factor and produce a frequency table that represents the number of observations in our sample from each state. Use the levels option within factor() to reorder the state categories to: Oklahoma, Kansas, Missouri, Nebraska.
+```{r}
+table(state) # levels appear in alphabetical order
+
+stlvl<-c("OK","KS","MO","NE") 
+fstate<-factor(state,stlvl)
+table(fstate) # order specified in level vector
+```
+
+####10. Suppose, further, that we have a measure of production for the plans in another vector:
+```{r}
+prod<-c(2341,9873,23933,1999,7214,9089,1099,2389,5435,5757,
+        +2521,7333,21909,15110,4369)
+prod
+```
+
+Use the help to investigate the tapply() function. 
+```{r}
+?tapply()
+```
+
+Write the command line that will produce the mean production for each state using tapply().
+```{r}
+tapply(prod,fstate,mean) # vector, level of detail, function to be applied
+```
+
+Write similar command lines that will produce the minimum and maximum production for each state.
+```{r}
+tapply(prod,fstate,min)
+tapply(prod,fstate,max)
+```
+
+##### Document Information.
+All of the statistical analyses in this document will be performed using `r R.version.string`.  R packages used will be maintained using the [packrat](http://rstudio.github.io/packrat/) dependency management system.  
+
+```{r session-info}
+sessionInfo()
+```
+
