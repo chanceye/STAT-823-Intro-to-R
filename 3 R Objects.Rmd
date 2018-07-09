@@ -745,7 +745,7 @@ C<-c(23,30,19,27)
 C
 ```
 
-Recall the relationship between Celsius and Fahrenheit temperatures: ???F = ???C  ×5 + 32.
+Recall the relationship between Celsius and Fahrenheit temperatures: ???F = ???C  Ã—5 + 32.
 Using a single line of code that includes arithmetic operations, create a new vector F that contains the temperatures transformed to Fahrenheit scale.
 ```{r}
 F<-(C*(9/5)+32)
