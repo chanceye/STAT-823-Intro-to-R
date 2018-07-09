@@ -1,0 +1,137 @@
+---
+title: "Analysis of Categorical Data"
+author: "Ellen Chancey"
+date: "July 23, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## One Sample Test  
+
+```{r}
+d <- data.frame(list(drink = c("Yes","No"), count = c(630, 670)))
+str(d)
+```
+  
+#### One  
+Appropriate tests for categorical variables include chi-square, Fisher, and logistic regression.  
+  
+    
+#### Two
+```{r}
+countsToCases <- function(x, countcol = "Freq") 
+  { 
+  idx <- rep.int(seq_len(nrow(x)), x[[countcol]]) 
+  x[[countcol]] <- NULL 
+  x[idx, ]
+}
+
+d.case <- countsToCases(d, countcol = "count")
+str(d.case)
+```
+  
+    
+#### Three
+```{r}
+require(ggplot2)
+qplot(d.case,main="Binge Drinking on Campus: A Survey of N = 1300 Undergraduates")
+```
+  
+    
+#### Four
+```{r}
+require(scales)
+d.df <- data.frame(d.case)
+
+ggplot(d.df, aes(x = d.case)) +
+  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  scale_y_continuous(labels=percent, name="Percent") +
+  scale_x_discrete(name="Response")
+```
+  
+    
+### Chi Square Goodness of Fit Test  
+  
+Five
+```{r}
+chisq.test(x=d$count, p=c(0.247,1-0.247))
+```
+
+```{r}
+0.247*1300
+(1-0.247)*1300
+```
+  
+    
+#### Six
+```{r}
+prop.test(x=630,n=1300,p=0.247,alternative="g")
+```
+There is not sufficient evidence to conclude that the rate of binge drinking is higher than 0.247 given that p = <2.2e-16 but the 95% confidence internval is 0.461:1.000
+
+### Binomial Test  
+  
+#### Seven and Eight
+```{r}
+binom.test(x=630,n=1300,p=0.247,alternative="g")
+```
+There is not sufficient evidence to conclude that the rate of binge drinking is higher than 0.247 given that p = <2.2e-16 but the 95% confidence internval is 0.461:1.000
+
+## Multi-Sample Tests  
+  
+#### One
+```{r}
+d <- read.csv("sales.csv",header=TRUE)
+str(d)
+library(MASS)
+d.table <- xtabs(~Region + Sport,data = d)
+summary(d.table)
+```
+
+
+#### Two
+```{r}
+prop.table(d.table,1)
+mosaicplot(d.table)
+```
+  
+  
+#### Three  
+Approprite test for multiple categorical variables include 2 sample t test, Mann-Whiteny, and Signed Rank  
+
+### Chi-square Test of Independence  
+
+#### Four and Five
+```{r}
+chisq.test(d.table)
+```
+There is sufficient evidence to suggest that the sales of sports gear at the retail outlet is dependent on geographic region (p = 9.473e-07).  
+
+###Fisher's Exact Test  
+
+#### Six and Seven
+```{r}
+fisher.test(d.table,workspace = 2e8)
+```
+There is sufficient evidence to suggest that the sales of sports gear at the retail outlet is dependent on geographic region (p = 3.106e-7).
+
+## Dependent Sample Tests
+
+```{r}
+d <- matrix(c(13, 4, 25, 92),
+              nrow = 2,
+              dimnames = list("Case"=c("Exposed","Unexposed"),
+                              "Control"=c("Exposed","Unexposed")))
+```
+
+
+### McNemar's Test
+
+```{r}
+require(exact2x2)
+mcnemar.exact(d)
+```
+There is sufficient evidence to conclude that there is an association between exposure to the toxin and occurence of disease (odds ratio = 6.25, p value = 1.037e-4)
