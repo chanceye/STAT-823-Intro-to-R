@@ -1,0 +1,338 @@
+---
+title: "Analysis of Continuous Data"
+author: "Ellen Chancey"
+date: "July 22, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+car<-c(19,26,24,21,24,23,26,24,23,26)
+library("BSDA", lib.loc="~/R/win-library/3.4")
+library("ggplot2",lib.loc="~/R/win-library/3.4")
+```
+ 
+  
+  
+####  One  
+The best visual to represent a single continuous variable is a histogram
+```{r}
+qplot(car, bins=15)
+```
+
+```{r}
+t.test(car)
+```
+
+  
+  
+####  Two
+```{r}
+mean(car)
+sd(car)
+```
+
+  
+  
+####  Three
+```{r}
+qqnorm(car)
+qqline(car)
+```
+Based on this graph, the points do not fall very close to the line, but they do mimic it  
+
+
+Using the shapiro-wilk test
+```{r}
+shapiro.test(car)
+```
+Because the p-value is greater than 0.05 (0.1702), this data does not violate the normality assumption.  
+  
+  
+
+####  Four
+```{r}
+t.test(car,mu=25)
+
+```
+There is not sufficient evidence to conclude that the average fuel economy of 2018 Sedans is not 25 mpg as reported by Company A (p = 0.083, 95% Confidence Interval is 21.96:25.22)  
+  
+  
+
+#### Five
+```{r}
+t.test(car, alternative="less",mu=25)
+# using "less" after getting "Error in match.arg(alternative): 
+# 'arg' should be one of "two.sided", "less"", "greater"
+```
+
+There is sufficient evidence to conclude that the average fuel economoy of 2018 Sedans is less than the 25 mpg reported by Company A (p=0.0415, 95% Confidence Interval for less than 24.92)  
+  
+  
+#### Six
+When two conflicting results occur, I would evaluate the appropriateness of each method. In this case, it seems unnecessary to test if the given average mpg is less than what is reported, and more appropriate to test if what is given is accurate. In addition, perhaps in this case it may also be appropriate to consider both results together and keep in mind that insufficient evidence to conclude one way does not mean the same thing as sufficient evidence to conclude the other way.  
+  
+  
+
+## Median Test
+```{r}
+require(BSDA)
+SIGN.test(car, md=25, alternative = "less")
+# using less instead of 1 due to error in argument
+```
+There is insufficient evidence to conclude that the median fuel economy of 2018 Sedans is less than the 25 mpg reported by Company A ( p = 0.1719, 95% Confidence Interval for 26 or less)  
+  
+  
+
+```{r}
+wilcox.test(car, mu = 25, alternative = "l", conf.int = TRUE)
+```
+There is sufficient evidence to cocnlude that the median fuel economy of the 2018 Sedans is less than the 25 pmg reported by Company A (p = 0.043, 95% Confidence Interval for 24.99 or less)  
+  
+  
+## Two Sample Tests
+Load the data
+```{r}
+drug <- c(101, 96, 102, 94, 99, 102, 101, 104, 100, 103, 105, 97, 94, 100, 99, 97, 98, 97, 104, 106)
+pla <- c(95, 88, 96, 89, 99, 93, 88, 86, 84, 85, 82, 96, 94, 89, 91, 88, 102, 86, 90, 91)
+time <- c(drug,pla)
+tx <- c(rep("drug",20),rep("pla",20))
+data <- list(time, tx)
+names(data) <- c("time","tx")
+data <- data.frame(data)
+```
+
+### t test  
+  
+  
+#### One
+```{r}
+ggplot(data, aes(x=tx, y = time, color=tx)) + geom_boxplot()
+```
+The best graphic to compare two continuous variables is the boxplot  
+  
+  
+#### Two
+```{r}
+tapply(data$time, data$tx, mean) # Computes group means
+tapply(data$time, data$tx, sd)
+```
+  
+  
+#### Three  
+Testing for normality within each group
+qplot for the drug group
+```{r}
+qqnorm(data$time[data$tx=="drug"])
+qqline(data$time[data$tx=="drug"])
+```
+  
+  
+qplot for the placebo group
+```{r}
+qqnorm(data$time[data$tx=="pla"])
+qqline(data$time[data$tx=="pla"])
+```
+  
+  
+Testing for equal group variance
+```{r}
+require(car)
+?leveneTest()
+leveneTest(data$time~data$tx)
+```
+  
+    
+    
+#### Four
+```{r}
+t.test(data$time~data$tx,alternative="g")
+```
+
+There is sufficient evidence to conclude that the drug slows reaction time when compared to placebo (p = 6.424e-08). The drug, on average increases reaction time by (95% Confidence Interval of 6.98 and higher.)  
+  
+  
+### Mann-Whitney Test    
+  
+  
+#### One  
+
+Shape of each group
+```{r}
+ggplot(data, aes(time)) + geom_histogram() + facet_grid(tx~.)
+```
+
+The test
+```{r}
+wilcox.test(data$time~data$tx, alternative = "g", paired = FALSE)
+```
+There is sufficient evidence to conclude that the drug slows reaction time when compared to placebo (p = 2.201e-06).   
+  
+  
+## Multi-Sample Tests  
+  
+  
+### One-Way ANOVA   
+  
+  
+#### One  
+Comparing boxplots is an effective way to visualize a continuous variable by groups
+```{r}
+data("InsectSprays")
+ggplot(InsectSprays, aes(x = spray, y = count)) + geom_boxplot()
+```
+
+
+#### Two
+```{r}
+tapply(InsectSprays$count,InsectSprays$spray, mean)
+tapply(InsectSprays$count,InsectSprays$spray, sd)
+```
+  
+    
+    
+#### Three
+```{r}
+attach(InsectSprays)
+leveneTest(count~spray)
+```
+There is sufficient evidence to conclude that atleast one of the variances are different, given p = 0.004223.  
+  
+  
+#### Four
+
+```{r}
+hist(count)
+
+count.ln <- log(count+1)
+hist(count.ln)
+leveneTest(count.ln~spray)
+
+```
+  
+  
+#### Five
+```{r}
+fit <- aov(count.ln~spray)
+names(fit)
+
+```
+  
+  
+#### Six
+```{r}
+qqnorm(fit$residuals)
+
+```
+Residuals have a linear distribution, meaning a normal one.  
+  
+  
+#### Seven
+```{r}
+summary(fit)
+```
+There is sufficient evidence to conclude that at least one of the insecticides is
+different in its effectiveness beacuse the variance (mean square) by spray is 7.704, much larger than the mean square of residuals, 0.167.  
+
+
+
+```{r}
+require(stats)
+TukeyHSD(fit)
+
+```
+Highly differential sprays include C/A, C/B, F/C and E/A, E/B, F/E  
+  
+  
+### Kruskal-Wallis Test  
+  
+  
+#### One  
+
+```{r}
+kruskal.test(count~spray)
+
+```
+There is sufficient evidence to conclude that at least one of the insecticides is
+different in its effectiveness (p = 1.511e-10)
+
+
+
+## Dependent Sample Tests  
+
+### t test  
+
+#### One 
+```{r}
+pre <- c(899.63, 913.51, 897.05, 889.18, 903.2, 916.06, 899.08, 892.75, 901.47, 902.63)
+post <- c(899.53, 899.38, 879.25, 867.35, 897.97, 921.42, 895.52, 893.95, 889.44, 898.14)
+data <- data.frame(cbind(pre,post))
+
+require(PairedData)
+with(data,plot(paired(pre,post),type="profile"))
+```
+Based on the graphic depiction, I think there is likely a correlation between the program and improved times.  
+
+
+#### Three  
+Mean and standard deviation of pre and post
+```{r}
+mean(pre)
+mean(post)
+sd(pre)
+sd(post)
+
+```
+  
+  
+
+#### Four  
+Mean and standard deviation of the difference in pre and post
+```{r}
+diff = pre - post
+mean(diff)
+sd(diff)
+
+```
+  
+  
+
+#### Five  
+
+Normal QQ plot
+```{r}
+qqnorm(diff)
+```
+  
+  
+Shapiro-Wilk Test
+```{r}
+shapiro.test(pre)
+shapiro.test(post)
+
+```
+Because the p-value is greater than 0.05 for both pre (0.5348) and post (0.2879), this data does not violate the normality assumption.  
+  
+  
+#### Six
+```{r}
+t.test(pre, post, paired = TRUE, alternative = "g")
+
+```
+There is sufficient evidence to conclude that the training program is effective
+at reducing swim times for Men's 1500 Freestyle (p = 0.01433). The program, on
+average, decreased swim time by 7.261 seconds (95% CI on difference: µpre???post > 2.14).  
+  
+    
+    
+### Wilcoxon Signed-Rank Test
+
+```{r}
+wilcox.test(pre, post, paired = TRUE, alternative = "g")
+```
+There is sufficient evidence to conclude that the training program is effective
+at reducing swim times for Men's 1500 Freestyle (p = 0.02441).
+
+This analysis is consistent with the paired t test
+
+
