@@ -321,7 +321,7 @@ t.test(pre, post, paired = TRUE, alternative = "g")
 ```
 There is sufficient evidence to conclude that the training program is effective
 at reducing swim times for Men's 1500 Freestyle (p = 0.01433). The program, on
-average, decreased swim time by 7.261 seconds (95% CI on difference: µpre???post > 2.14).  
+average, decreased swim time by 7.261 seconds (95% CI on difference: Âµpre???post > 2.14).  
   
     
     
