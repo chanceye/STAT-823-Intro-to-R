@@ -1,0 +1,195 @@
+---
+title: "Comparison of Alcohol Use by Youth in 2013 and 2015"
+author: "Ellen Chancey"
+output:
+  pdf_document: default
+  md_document: default
+  odt_document: default
+  html_document:
+    toc: yes
+    toc_float: yes
+  rtf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+# This chunk of code sets up the R session to perform the analysis
+# Load packages, load data, load any other source scripts that may contain
+# code or objects you will want to run to produce the report
+
+# load packages
+require(ggplot2)
+require(dplyr)
+require(car)
+require(DT)
+require(knitr)
+
+# declare global chunk options
+# knitr::opts_chunk$set(echo = FALSE)
+
+# determine output format dynamically
+out_type <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+
+# load data sets
+
+youthalc1<-read.csv(file="YouthAlcoholUseCleanedv3.csv")
+youthalc2<-read.csv(file="YouthAlcoholUseCleanedv2.csv")
+
+# For example,
+
+# define custom function for data label outputs
+# The DT::datatable function is great for producing tables for HTML docs
+# Otherwise, use the knitr::kable function to produce tables
+# You should use the R help to learn about these two functions as they
+# will need to be used to produce visually appealing tables for your 
+# report
+
+display_output <- function(dataset, out_type, filter_opt = 'none') {
+  
+  if (out_type == "html") {
+    out_table <- DT::datatable(dataset, filter = filter_opt)
+  } else {
+    out_table <- knitr::kable(dataset)
+  } 
+  
+  out_table
+}
+```
+
+## Primary Analysis Objectives
+
+Determine whether the rate of alcohol use by youth, as reported by the Centers for Disease Control and Prevention (CDC) in their US Chronic Disease Indicators data, is significantly lower in 2015 than in 2013.
+
+
+## Background
+
+The CDC has identified 124 indicators of chronic disease, one of which is the rate of alcohol use by youth. The CDC collects and distributes data on these indicators for use in public health efforts.
+
+## Data Sources
+
+The following dataset will be used throughout the statistical analyses:
+
+US Chronic Disease Indicators: <https://catalog.data.gov/dataset/u-s-chronic-disease-indicators-cdi-e50c9>
+
+Data regarding use of alcohol by youth is extracted from the dataset, which contains all 124 indicators, and is then narrowed to only those states and territories that reported data in both 2013 and 2015. Finally, the data is formatted into two different structures. The difference between the two structures is that the youthalc1 dataset contains a record for each state or territory for each year. The second dataset, youthalc2 contains one record for each state or territory, with the datapoint for each year as a variable within the dataset.
+
+### youthalc1
+
+This dataset is used to conveniently plot data before analysis. 
+
+```{r demo-describe 2}
+display_output(youthalc1, out_type)
+```
+
+### youthalc2
+
+This dataset is used to complete analysis.
+```{r demo-describe}
+display_output(youthalc2, out_type)
+```
+
+
+## Analysis Methods
+
+### About the Data
+
+#### Mean and Standard Deviation
+
+Mean and standard deviation provide a general picture of the data to compare the two years before analysis.
+
+2013
+```{r}
+mean(youthalc2$Rate2013)
+sd(youthalc2$Rate2013)
+```
+
+2015
+```{r}
+mean(youthalc2$Rate2015)
+sd(youthalc2$Rate2015)
+```
+
+#### Basic plots
+
+Distribution of Youth Alcohol Use by Year
+```{r}
+ggplot(data=youthalc1, aes(x=Rate))+
+  geom_histogram() + 
+  facet_grid(Year~.) +
+  ggtitle("Youth Alcohol Use Distribution by Year")
+```
+
+Boxplot of Youth Alcohol Use by Year
+```{r}
+Yearf<-factor(youthalc1$Year)
+ggplot(data=youthalc1, aes(x=Yearf,y=Rate))+
+  geom_boxplot() +
+  ggtitle("Rate of Youth Alcohol Use in US States and Territories, by Year")
+```
+
+### Assumptions
+
+All inferences are conducted using $\alpha = 0.05$ unless stated otherwise. No adjustments for multiplicity are made as this is an exploratory analysis. Discrete variables are summarized with proportions and frequencies. Continuous variables are summarized using the following statistics:
+
+* mean
+* median
+* standard deviation
+* coefficient of variation
+* quantiles
+* minimum
+* maximum
+
+#### Normality of Paired Differences
+
+Normality of paired differences is tested by use of a QQ Plot and the Shapiro-Wilk test.
+
+#### QQ Plot
+
+According to the QQ Plot, the years have similar distributions.
+
+```{r}
+difference<-youthalc2$Rate2013-youthalc2$Rate2015
+qqnorm(difference)
+qqline(difference)
+```
+
+
+
+#### Shapiro-Wilk Test
+
+According to the Shapiro-Wilk test there is insufficient evidence to reject the null hypothesis of normality (p=0.232)
+
+```{r}
+shapiro.test(difference)
+
+```
+
+
+
+### Primary Objective Analysis
+
+The primary objective analysis uses a paired t test to determine if there is a significant difference between alcohol use by youth in 2013 and 2015.
+
+
+### Primary Objective Results
+
+```{r primary}
+t.test(youthalc2$Rate2013, youthalc2$Rate2015, paired=TRUE, alternative="g")
+
+```
+
+
+### Conclusions and Discussion
+
+There is sufficient evidence to conclude that the rate of alcohol consumption by youth was higher in 2013 than in 2015 (p = 2.537e-08). On average the rate in 2013 was 2.44 points higher than in 2015 (95% CI).
+
+One limitation of these findings is that only states and territories that reported data in both 2013 and 2015 were included. A more complete picture of the federal trend could be determined if all states and territories had both data points.
+
+### Information
+
+All of the statistical analyses in this document will be performed using `r R.version.string`.  R packages used will be maintained using the [packrat](http://rstudio.github.io/packrat/) dependency management system.  
+
+```{r session-info}
+sessionInfo()
+```
+
