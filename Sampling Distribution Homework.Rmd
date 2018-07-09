@@ -1,0 +1,72 @@
+---
+title: "Sample Distribution Homework"
+author: "Ellen Chancey"
+date: "July 8, 2017"
+output: html_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Introduction
+Sampling distribution is a foundational concept in statistics that should be thoroughly understood both on its own, and in the way that it is applied. This report provides a basic description of sampling distribution. Each round will demonstrate some aspect of sampling distribution.
+
+
+
+
+
+### Setup
+In this scenario, there is a population of random numbers with a $\mu$ of 50 and $\sigma$ of 10. We will sample this population in three rounds of 1000. During the first round, we will take a sample from the population 1000 different times, each time selecting just five numbers from the population. In the second round, we will take a sample from the population 1000 times, but each time we will select 25 numbers. Finally, in the third round we will sample the population 1000 times, selecting 500 numbers for each sample.
+
+
+
+
+### Round One n=5
+
+In this round, we aren't picking very many numbers for each sample, so there are many sections of the population distribution that aren't being represented in a given sample. When this occurs, the mean of the sample is very different from the mean of the population, because its not very representative of all of the numbers in the population.
+
+Furthermore, if we perform 1000 of these samples, we are going to get varying means for each of them. This is because there is a lot of variablity in the five numbers that are selected, and again, those numbers aren't always representative of the overal population distribution. For example, some samples will be all large numbers, while others will be all small numbers. These samples are those represented on the edges of the final histogram.
+
+![Round One Graphic](C:/Users/EC052367/Documents/MS-ASA/STAT 823 Intro to R/my working directory/n5.png).
+
+While I pointed out the distributions on the edges, you will notice that overall, this sampling distribution still looks a lot like the population distribution. The means of the samples still center around the mean of the population.
+
+
+
+
+
+### Round Two n=25
+
+In this round, we are picking more numbers in each of our samples. That means that its easier for these samples to represent different parts of the population distribution. Each number drawn is another opportunity to represent some areas of the population distribution that isn't yet represented.
+
+Thinking back to the sample sizes in round one that are on the edges of the histogram, the chances that we get a sample with a mean so far from the population mean is not as likely. This is because we increased the sample size, so there are fewer outlier samples.
+
+![Round Two Graphic](C:/Users/EC052367/Documents/MS-ASA/STAT 823 Intro to R/my working directory/n25.png).
+
+In this histogram, you'll notice that the distribution of samples is more narrow. This means that there are more samples who have a similar mean.
+
+
+
+
+
+### Round Three n=500
+
+In this round we are selecting 500 numbers in each sample - a large portion of the population - and we are doing that over and over and over again. Because we are selecting so many numbers in each sample, its highly likely that one number in the population will end up in many samples. Back when we were selecting only five numbers in each sample, it was such a small number that we could take many many samples without ever selecting the same number twice. However, in this case, we are selecting many numbers every time, so many numbers will appear in more than one sample.
+
+When the sample size is larger and the various samples are more likely to have the same numbers, those samples are more similar to each other - they have more in common. Compare this to samples in the first round which could have had vastly different means because they were probably different numbers every single time.
+
+![Round Three Graphic](C:/Users/EC052367/Documents/MS-ASA/STAT 823 Intro to R/my working directory/n500.png).
+
+Here you can see that the sampling distribution is even narrower, meaning a large portion of the samples have very similar means. In addition, these means are even closer to the population mean than previous rounds because there is less variability between the samples, and they are better representations of the entire population.
+
+
+
+### Document Information.
+
+All of the statistical analyses in this document will be performed using `r R.version.string`.  R packages used will be maintained using the [packrat](http://rstudio.github.io/packrat/) dependency management system.  
+
+```{r session-info}
+sessionInfo()
+```
