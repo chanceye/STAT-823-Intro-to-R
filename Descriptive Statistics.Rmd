@@ -1,0 +1,277 @@
+---
+title: "Descriptive Statistics Homework"
+author: "Ellen Chancey"
+date: "July 16, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("babynames", lib.loc="~/R/win-library/3.4")
+library("ggplot2", lib.loc="~/R/win-library/3.4")
+library("Hmisc", lib.loc="~/R/win-library/3.4")
+library("dplyr", lib.loc="~/R/win-library/3.4")
+library("MASS", lib.loc="~/R/win-library/3.4")
+library("vcd", lib.loc="~/R/win-library/3.4")
+```
+
+# Descriptive Statistics
+
+### Describing a Dataset
+
+One
+```{r}
+?survey()
+```
+
+Two
+```{r}
+str(survey)
+```
+
+Three
+```{r}
+describe(survey)
+```
+
+Four
+```{r}
+table(survey$Sex)
+table(survey$Exer)
+table(survey$Smoke)
+
+table(survey$Sex, survey$Exer)
+table(survey$Sex, survey$Smoke)
+
+mytable<-table(survey$Sex, survey$Exer)
+prop.table(mytable)
+
+mytable2<-table(survey$Sex, survey$Smoke)
+prop.table(mytable2)
+```
+
+Five
+```{r}
+# library(ggplot2)
+ggplot(survey, aes(survey$Height,survey$Wr.Hnd, size=Age, color=Pulse)) +
+    geom_point()
+```
+
+Six
+```{r}
+summary(survey) # contains mean
+sd(survey$Wr.Hnd, na.rm=TRUE)
+sd(survey$NW.Hnd, na.rm=TRUE)
+sd(survey$Pulse, na.rm=TRUE)
+sd(survey$Height, na.rm=TRUE)
+sd(survey$Age, na.rm=TRUE)
+```
+
+Writing hand
+```{r}
+ggplot(survey, aes(x = survey$Sex, y = survey$Wr.Hnd )) + geom_boxplot()
+```       
+
+Non writing hand
+```{r}
+# ggplot(survey, aes(x = survey$Sex, y = survey$Nw.Hnd )) + geom_boxplot()
+```
+
+Pulse
+```{r}
+ggplot(survey, aes(x = survey$Sex, y = survey$Pulse )) + geom_boxplot()
+```
+
+Height
+```{r}
+ggplot(survey, aes(x = survey$Sex, y = survey$Height )) + geom_boxplot()
+```
+
+Age
+```{r}
+ggplot(survey, aes(x = survey$Sex, y = survey$Age )) + geom_boxplot()
+```
+
+
+
+
+
+#### Describing Bivariate Relationshops
+
+One  
+More males regularly or occasionally smoke, while more females report never smoking
+```{r}
+smoke2<-factor(survey$Smoke,levels=c("Never","Occas","Regul","Heavy"))
+
+table(survey$Sex,smoke2)
+```
+
+
+```{r}
+table(survey$Sex,smoke2)
+smokebehave<-table(survey$Sex, smoke2)
+prop.table(smokebehave)
+```
+
+Two  
+The graph indicates that most students, whether male or female never smoke. It also indicates that there are fewer men who never smoke
+```{r}
+ggplot(data=survey,aes(x=smoke2)) +
+  geom_bar() +
+  facet_grid(.~ survey$Sex) +
+  ggtitle("Smoking Behavior by Sex")
+```
+
+Three  
+No, it appears the distribution of exercise for those who do smoke is immilar to those who don't.
+```{r}
+exer2<-factor(survey$Exer,levels=c("None","Some","Freq"))
+smokeexer<-table(exer2,smoke2)
+prop.table(smokeexer)
+```
+
+```{r}
+ggplot(data=survey,aes(x=exer2))+
+    geom_bar() +
+    facet_grid(.~ survey$Smoke)
+```
+
+Four  
+Most students have never smoked and do exercise
+```{r}
+mosaic(smokeexer)
+```
+
+Five
+```{r}
+ggplot(data=survey, aes(x=survey$Wr.Hnd, y=survey$Height)) +
+  geom_point() +
+  geom_smooth(method="lm")
+```
+
+Six  
+This does not work
+```{r}
+cor(survey$Wr.Hnd, survey$Height, method = "pearson")
+```
+
+This works because it accounts for the missing values. The result indicates that there is a modest correlation
+```{r}
+cor(survey$Wr.Hnd, survey$Height, use="complete")
+
+```
+
+Seven  
+They are consistent
+```{r}
+ff <- lm(survey$Height~survey$Wr.Hnd)
+summary(ff)
+```
+
+Eight  
+Estimate for Wr Hand is 3.1166
+
+Nine  
+Pulses of those who exercise frequently are generally a bit lower than those who exercise some or not at all
+```{r}
+ggplot(data=survey,aes(x=exer2, y = survey$Pulse)) +
+  geom_boxplot()
+```
+
+Ten  
+Data indicates that those who exervice frequently have a lower average pulse and that they also have a narrower standard deviation.
+```{r}
+?tapply()
+tapply(survey$Pulse, exer2, mean, na.rm=TRUE)
+tapply(survey$Pulse, exer2, sd, na.rm=TRUE)
+```
+
+Eleven  
+The p value is 2.2e-16, so very small, based on this I would conclude that we can reject the hypothesis that there is no differene in pulse by exercice group
+```{r}
+ff <- aov(survey$Pulse~survey$Exer)
+summary(ff)
+```
+
+Twelve  
+Only Some and Frequent are significantly different because its p value is less than 0.05
+```{r}
+TukeyHSD(ff)
+```
+
+
+#### Annotations
+
+```{r}
+ggplot(economics, aes(date, unemploy)) + geom_line()
+```
+
+```{r}
+ggplot(economics) +
+  geom_rect(
+   aes(xmin = start, xmax = end, fill = party),
+   ymin = -Inf, ymax = Inf, alpha = 0.2, data = presidential
+   ) +
+  geom_vline(
+   aes(xintercept = as.numeric(start)),
+   data = presidential,
+   colour = "grey50", alpha = 0.5
+   ) +
+  geom_text(
+    aes(x = start, y = 2500, label = name),
+    data = presidential,
+    size = 3, vjust = 0, hjust = 0, nudge_x = 50
+    ) +
+  geom_line(aes(date, unemploy)) +
+  scale_fill_manual(values = c("blue", "red"))
+```
+
+#### Additional Exercises
+
+One  
+Group = aes statement is required to use cyl, a continuous variable
+```{r}
+ggplot(data=mpg,aes(x=cyl, y=hwy, group= cyl)) +
+  geom_boxplot()
+```
+
+Two  
+Three bars
+```{r}
+ggplot(mpg, aes(drv)) + geom_bar(colour = "white")
+```
+
+Three bars with a number of sections, one for each hwy value
+```{r}
+ggplot(mpg, aes(drv, fill = hwy, group = hwy)) + geom_bar(colour = "white")
+```
+
+Three  bars with a large number of sections, one for each id
+```{r}
+mpg2 <- mpg %>% arrange(hwy) %>% mutate(id = seq_along(hwy))
+ggplot(mpg2, aes(drv, fill = hwy, group = id)) + geom_bar(colour = "white")
+```
+
+Three  
+Popularity of Jo has a relatively normal distributuion centered around the late 50s
+```{r}
+Jo <- dplyr::filter(babynames, name == "Jo")
+ggplot(Jo, aes(year, n)) + geom_line()
+```
+
+my name's popularity has three waves of popularity, first around 1920 where it reaches 3000, then again in the 50s and 60s it has its highest peak up to 6000, then has a resurgence in the late 80s and early 90s (when I was born) around 1500
+```{r}
+Ellen <- dplyr::filter(babynames, name == "Ellen")
+ggplot(Ellen, aes(year, n)) + geom_line()
+```
+
+
+## Document Information.
+
+All of the statistical analyses in this document will be performed using `r R.version.string`.  R packages used will be maintained using the [packrat](http://rstudio.github.io/packrat/) dependency management system.  
+
+```{r session-info}
+sessionInfo()
+```
+
+
